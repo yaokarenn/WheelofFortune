@@ -1,0 +1,165 @@
+
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+string convert2U(string p){
+	for(int i=0; i < p.length(); i++){
+		if(isalpha(p[i])) {
+			p[i]='_';
+		}
+	}
+	return p;
+}
+
+void display(string p){
+	for(int i=0; i < p.length(); i++){
+		cout << p[i] <<" ";
+	}
+	cout << endl;
+}
+
+
+int main(){
+	srand(time(0));
+	string puzzle[] = {"Happy Birthday!", "Merry Christmas!", "Happy Thanksgiving!", "Happy New Years!", "Neww York", "Connecticut", "Alabama", "Arizona", "Arkansas", "California","Delaware","Georgia", "World War I", "French Revolution", "World War II", "Spanish American Revolution", "Haiti Revolution"};
+  string puzzlePick;
+  string guessPuzzle;	
+	string puzzle_u;
+	int wheelOptions[] = {0, 800, 500, 650, 500, 900, 1, 5000, 500, 600, 700, 600, 550, 500, 700, 500, 600, 550, 500, 600, 1, 650, 10000, 700};
+	int earnedAmount = 0;
+	char vowels[]= {'a', 'e', 'i', 'o', 'u'};
+	int misses = 10;
+  bool is_vowel;
+	char choice;
+  bool letterFound = false;
+  int round=1;
+
+  do{
+    //New puzzle
+    puzzlePick= puzzle[rand() %sizeof(puzzle)/sizeof(puzzle[0])];
+    cout << endl<<"solution: " << puzzlePick <<endl;
+    puzzle_u = convert2U(puzzlePick);
+	  if (puzzlePick == puzzle[0] || puzzlePick == puzzle[1] || puzzlePick == puzzle[2] || puzzlePick == puzzle[3]){
+		  cout << "HINT: category is holidays" << endl;
+	  } 
+	  else if (puzzlePick == puzzle[4] || puzzlePick == puzzle[5] || puzzlePick == puzzle[6] || puzzlePick == puzzle[7] || puzzlePick == puzzle[8]|| puzzlePick == puzzle[9]|| puzzlePick == puzzle[10]){
+		  cout << "HINT: category is states" << endl;
+	  } else {
+		  cout << "HINT: category is world events" << endl;
+	  }
+	  
+    
+  	do{//rounds start here
+      cout<<"round "<<round<<endl;
+      is_vowel=false;
+  		for(int i=0; i < puzzle_u.length(); i++){
+  			cout << puzzle_u[i] << " ";
+  		}
+  		cout << endl << "\n";
+  
+  			char guessLetter;
+  			cout << "Current Puzzle: ";
+  			display(puzzle_u);
+			cout << "you have " <<misses << " misses"<< endl;
+			cout << "you have $" << earnedAmount << endl;
+  			cout << "1. Spin the wheel\n2. Buy a Vowel ($250)\n3. Solve the Puzzle\nenter 1, 2, or 3: ";
+  			cin >> choice;
+  			if (choice == '1') {
+  				int spinResult = wheelOptions[rand() % 24];
+  					if(spinResult == 0){
+  						cout << "Lose a Turn!" << endl;
+  					}
+  					else if(spinResult == 1){
+  						cout << "Bankrupt! You lose all your money." << endl;
+  						earnedAmount = 0;
+  					} else{
+  						cout << "Wheel landed on: $" << spinResult << endl;
+  				  earnedAmount+=spinResult;
+  				
+  				cout << "Enter a letter: ";
+  				cin >> guessLetter;
+  				for (int i = 0; i < sizeof(vowels)/sizeof(vowels[0]); i++) {
+  					if (tolower(guessLetter) == vowels[i]) {
+  						cout << "You guessed a vowel!" << endl;
+  						--misses;
+  	          is_vowel=true;
+  					}
+  				}
+  				
+  				cout << endl;
+          if(!is_vowel){
+    				for(int i=0; i < puzzle_u.length(); i++){
+    			//fixes casee sensiveity 
+    	        if((tolower(puzzlePick[i])==guessLetter||toupper(puzzlePick[i]) == guessLetter )){
+    	          //replacess with correct case 
+    						puzzle_u[i] = puzzlePick[i];
+    						letterFound = true;
+    					}	 
+    				}
+    				if (letterFound == false) {
+    					cout << "wrong letter, guess again!\n";
+    					--misses;
+    				}
+    	      else{
+    	        cout << "correct letter!\n";
+    	        earnedAmount+=200;
+    	      }
+    			}
+          }
+  		} 
+      else if (choice == '2') {
+  		if (earnedAmount >= 250) {
+  			char guessVowel;
+  			cout << "Enter a vowel: ";
+  			cin >> guessVowel;
+  			for(int i=0; i <puzzlePick.length(); i++){
+  				//fixes casee sensiveity 
+  				if(tolower(puzzlePick[i])==guessVowel||toupper(puzzlePick[i]) == guessVowel ){
+  				  //replacess with correct case 
+  							puzzle_u[i] = puzzlePick[i];
+  							letterFound = true;
+  				} 
+  			}
+        if(!letterFound){
+    		  cout << "wrong letter, guess again!\n";
+    		  --misses;	
+  		  }
+      }else {
+  			cout << "You don't have enough money to buy a vowel." << endl;
+  		}	
+      } else if (choice == '3') {
+        int counter=0;
+  		cout << "Enter the puzzle: ";
+      //cin>>guessPuzzle;
+  		getline(cin,guessPuzzle);
+      getline(cin,guessPuzzle);
+
+      for(int i=0; i < puzzlePick.length(); i++){
+          //fixes casee sensiveity 
+if(tolower(puzzlePick[i])==tolower(guessPuzzle[i])){
+          //replacess with correct case 
+         counter++;
+        }	 
+      }
+  		if (++counter==puzzlePick.length()) {
+  			cout << "You guessed the puzzle correctly!"<<endl;
+			   puzzle_u=puzzlePick;
+  		}
+        else {
+          cout<<"Guessed wrong, try again!"<<endl;
+          --misses;
+        }
+      
+  	} else {
+		  cout << "Invalid choice! Please pick again:" <<endl;
+	}
+		
+  	} while(puzzle_u != puzzlePick&&misses>0);
+  		++round;
+  }while(round<=3);
+}
+
+
